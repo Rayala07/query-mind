@@ -12,14 +12,14 @@ export function validate(req, res, next) {
 }
 
 /**
- * Validator for the user registration endpoint.
+ * @desc Validator for the user registration endpoint.
  * Checks for:
  * - username: must be present and trimmed.
  * - email: must be a valid email format and normalized.
  * - password: must be at least 6 characters long for security.
  */
 export const registerValidator = [
-  // Validate and sanitize the username
+  /** @desc Validate and sanitize the username */
   body("username")
     .trim()
     .notEmpty()
@@ -27,7 +27,7 @@ export const registerValidator = [
     .isLength({ min: 3 })
     .withMessage("Username must be at least 3 characters long"),
 
-  // Validate and sanitize the email
+  /** @desc Validate and sanitize the email */
   body("email")
     .trim()
     .notEmpty()
@@ -38,7 +38,7 @@ export const registerValidator = [
       gmail_remove_dots: false,
     }),
 
-  // Validate the password
+  /** @desc Validate the password */
   body("password")
     .trim()
     .notEmpty()
@@ -46,6 +46,27 @@ export const registerValidator = [
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
 
-  // Validate function
+  /** @desc Validate function */
+  validate,
+];
+
+export const loginValidator = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email format")
+    .normalizeEmail({
+      gmail_remove_dots: false,
+    }),
+
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+
   validate,
 ];
