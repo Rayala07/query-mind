@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    lastVerificationEmailSentAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
