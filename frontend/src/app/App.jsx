@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
-import routes from "./routes";
-import "./index.css"
+import routes from "./app.routes";
+import "./app/index.css"
 
 const App = () => {
   return (

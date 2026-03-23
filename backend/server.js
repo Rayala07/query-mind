@@ -3,7 +3,7 @@ import "dotenv/config";
 import connectDB from "./src/config/db.js";
 import { testAi } from "./src/services/ai.service.js";
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 connectDB();
 
