@@ -8,7 +8,7 @@ const auth_api = axios.create({
 export const register = async ({ name, email, password }) => {
   try {
     const payload = {
-      name,
+      username: name,
       email,
       password,
     };
@@ -16,6 +16,7 @@ export const register = async ({ name, email, password }) => {
     return res.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 

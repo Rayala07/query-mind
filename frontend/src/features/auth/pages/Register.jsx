@@ -96,7 +96,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await handleRegister(form);
-    navigate('/login');
+    navigate('/verify-email', { state: { email: form.email } });
   };
 
   return (
