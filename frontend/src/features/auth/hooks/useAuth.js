@@ -1,9 +1,10 @@
-import { useDispatch } from "@reduxjs/toolkit";
+import { useDispatch, useSelector } from "react-redux";
 import { register, login, getMe } from "../services/auth.service";
 import { setUser, setLoading, setError } from "../auth.slice.js";
 
-export function useAuth() {
+export default function useAuth() {
   const dispatch = useDispatch();
+  const { user, loading: isLoading, error } = useSelector((state) => state.auth);
 
   async function handleRegister({ name, email, password }) {
     try {
@@ -44,5 +45,5 @@ export function useAuth() {
     }
   }
 
-  return { handleRegister, handleLogin, handleGetMe };
+  return { handleRegister, handleLogin, handleGetMe, user, isLoading, error };
 }

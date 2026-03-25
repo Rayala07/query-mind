@@ -1,11 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
 import Register from "../features/auth/pages/Register";
 import Login from "../features/auth/pages/Login";
+import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 
 const routes = createBrowserRouter([
     {
         path: "/",
-        element: <p>Home</p>,
+        element: (
+            <ProtectedRoute>
+                <p>Home</p>
+            </ProtectedRoute>
+        ),
     },
     {
         path: "/register",

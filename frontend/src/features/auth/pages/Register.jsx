@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   RiMailLine,
   RiLockPasswordLine,
@@ -12,6 +12,7 @@ import {
 import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
+import useAuth from '../hooks/useAuth.js';
 
 /* ─── Brand Panel ─── */
 const BrandPanel = () => (
@@ -83,33 +84,19 @@ const BrandPanel = () => (
 /* ─── Register Page ─── */
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
 
-  const validate = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = 'Full name is required';
-    if (!form.email) e.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email';
-    if (!form.password) e.password = 'Password is required';
-    else if (form.password.length < 8) e.password = 'Minimum 8 characters';
-    if (!form.confirmPassword) e.confirmPassword = 'Please confirm your password';
-    else if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
-    return e;
-  };
+  const navigate = useNavigate();
+
+  const { handleRegister, isLoading } = useAuth();
 
   const handleChange = (field) => (e) => {
     setForm((p) => ({ ...p, [field]: e.target.value }));
-    if (errors[field]) setErrors((p) => ({ ...p, [field]: '' }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
+    await handleRegister(form);
+    navigate('/login');
   };
 
   return (
@@ -144,7 +131,7 @@ const Register = () => {
                 value={form.name} onChange={handleChange('name')}
                 placeholder="Alex Johnson"
                 icon={<RiUser3Line size={15} />}
-                error={errors.name} required
+                required
               />
               <AuthInput
                 label="Email address"
@@ -152,7 +139,7 @@ const Register = () => {
                 value={form.email} onChange={handleChange('email')}
                 placeholder="you@example.com"
                 icon={<RiMailLine size={15} />}
-                error={errors.email} required
+                required
               />
               <AuthInput
                 label="Password"
@@ -160,7 +147,7 @@ const Register = () => {
                 value={form.password} onChange={handleChange('password')}
                 placeholder="Min. 8 characters"
                 icon={<RiLockPasswordLine size={15} />}
-                error={errors.password} required
+                required
               />
               <AuthInput
                 label="Confirm password"
@@ -168,7 +155,7 @@ const Register = () => {
                 value={form.confirmPassword} onChange={handleChange('confirmPassword')}
                 placeholder="Re-enter your password"
                 icon={<RiShieldKeyholeLine size={15} />}
-                error={errors.confirmPassword} required
+                required
               />
 
               <div style={{ marginTop: 6 }}>

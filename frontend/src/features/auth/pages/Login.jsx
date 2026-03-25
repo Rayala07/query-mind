@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   RiMailLine,
   RiLockPasswordLine,
@@ -11,6 +11,7 @@ import {
 import AuthCard from '../components/AuthCard';
 import AuthInput from '../components/AuthInput';
 import AuthButton from '../components/AuthButton';
+import useAuth from "../hooks/useAuth.js"
 
 /* ─── Brand Panel ─── */
 const BrandPanel = () => (
@@ -81,32 +82,23 @@ const BrandPanel = () => (
 
 /* ─── Login Page ─── */
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
 
-  const validate = () => {
-    const e = {};
-    if (!form.email) e.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email';
-    if (!form.password) e.password = 'Password is required';
-    else if (form.password.length < 8) e.password = 'Minimum 8 characters';
-    return e;
-  };
+  const navigate = useNavigate();
+
+  const { handleLogin, isLoading } = useAuth();
 
   const handleChange = (field) => (e) => {
     setForm((p) => ({ ...p, [field]: e.target.value }));
-    if (errors[field]) setErrors((p) => ({ ...p, [field]: '' }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-    setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
+    await handleLogin(form);
+    navigate("/");
   };
 
   return (
@@ -141,7 +133,7 @@ const Login = () => {
                 value={form.email} onChange={handleChange('email')}
                 placeholder="you@example.com"
                 icon={<RiMailLine size={15} />}
-                error={errors.email} required
+                required
               />
               <AuthInput
                 label="Password"
@@ -149,31 +141,11 @@ const Login = () => {
                 value={form.password} onChange={handleChange('password')}
                 placeholder="••••••••"
                 icon={<RiLockPasswordLine size={15} />}
-                error={errors.password} required
+                required
               />
 
-              {/* Remember + forgot */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
-                  <div
-                    onClick={() => setRememberMe((v) => !v)}
-                    style={{
-                      width: 16, height: 16, borderRadius: 5, flexShrink: 0,
-                      background: rememberMe ? 'var(--accent)' : 'transparent',
-                      border: `1.5px solid ${rememberMe ? 'var(--accent)' : 'rgba(255,255,255,0.12)'}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {rememberMe && (
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    )}
-                  </div>
-                  <input type="checkbox" className="sr-only" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
-                  <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Remember me</span>
-                </label>
+              {/* Forgot password */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
                 <Link to="/forgot-password" style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 500, textDecoration: 'none', opacity: 0.9 }}>Forgot password?</Link>
               </div>
 
