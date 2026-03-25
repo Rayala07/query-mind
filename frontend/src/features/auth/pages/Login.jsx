@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
   RiMailLine,
   RiLockPasswordLine,
@@ -91,6 +92,8 @@ const Login = () => {
 
   const { handleLogin, isLoading } = useAuth();
 
+  const {user, loading} = useSelector((state) => state.auth)
+
   const handleChange = (field) => (e) => {
     setForm((p) => ({ ...p, [field]: e.target.value }));
   };
@@ -100,6 +103,10 @@ const Login = () => {
     await handleLogin(form);
     navigate("/");
   };
+
+  if(!loading && user) {
+    return <Navigate to="/" replace />
+  }
 
   return (
     <div className="h-dvh w-full overflow-hidden grid lg:grid-cols-2" style={{ background: 'var(--bg-base)' }}>
