@@ -46,6 +46,13 @@ export const getChats = async (req, res) => {
 
   const chats = await Chat.find({ user: userId });
 
+  if (!chats) {
+    return res.status(404).json({
+      success: false,
+      message: "Chats not found",
+    });
+  }
+
   res.status(200).json({
     success: true,
     message: "Chats retrieved successfully",
@@ -53,7 +60,7 @@ export const getChats = async (req, res) => {
   });
 };
 
-export const getChat = async (req, res) => {
+export const getMessagesOfChat = async (req, res) => {
   const chatId = req.params.chatId;
 
   const chat = await Chat.findOne({ _id: chatId, user: req.user.id });
@@ -65,9 +72,32 @@ export const getChat = async (req, res) => {
     });
   }
 
+  const messages = await Message.find({ chat: chatId });
+
   res.status(200).json({
     success: true,
-    message: "Chat retrieved successfully",
-    chat,
+    message: "Messages retrieved successfully",
+    messages,
+  });
+};
+
+export const deleteChat = async (req, res) => {
+  const { chatId } = req.params;
+
+  const chat = await Chat.findOne({ _id: chatId, user: req.user.id });
+
+  if (!chat) {
+    return res.status(404).json({
+      status: false,
+      message: "Chat not found",
+    });
+  }
+
+  await Chat.deleteOne({ _id: chatId, user: req.user.id });
+  await Message.deleteMany({ chat: chatId });
+
+  res.status(200).json({
+    success: true,
+    message: "Chat deleted successfully",
   });
 };
