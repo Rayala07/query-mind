@@ -22,7 +22,7 @@ export const sendMessage = async (req, res) => {
     role: "user",
   });
 
-  const messages = await Message.find({ chat: chatId });
+  const messages = await Message.find({ chat: chatId || chat._id });
 
   const response = await generateResponse(messages);
 

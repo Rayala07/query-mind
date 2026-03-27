@@ -1,35 +1,12 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
 import MessageInput from "../components/MessageInput";
 
-const mockMessages = [
-  {
-    id: 1,
-    isUser: true,
-    message: "What is the difference between supervised and unsupervised learning?",
-  },
-  {
-    id: 2,
-    isUser: false,
-    message:
-      "Great question!\n\nSupervised learning trains on labeled data — the model learns the mapping from inputs to known outputs. Examples include classification and regression.\n\nUnsupervised learning works with unlabeled data, finding hidden patterns or structures on its own. Examples include clustering (K-Means) and dimensionality reduction (PCA).\n\nThe key distinction: supervised learning requires ground truth labels; unsupervised does not.",
-  },
-  {
-    id: 3,
-    isUser: true,
-    message: "Can you give me a practical real-world example of each?",
-  },
-  {
-    id: 4,
-    isUser: false,
-    message:
-      "Sure!\n\nSupervised: Email spam detection — the model is trained on thousands of emails labeled as spam or not spam, and learns to classify new emails accordingly.\n\nUnsupervised: Customer segmentation — a retail company groups customers by purchasing behavior without predefined categories, discovering natural clusters like deal hunters, loyal shoppers, etc.",
-  },
-];
-
 const Dashboard = () => {
-  const [messages, setMessages] = useState(mockMessages);
+  const { chats, currentChatId } = useSelector((state) => state.chat);
+  const [messages, setMessages] = useState(chats[currentChatId]?.messages || []);
   const [inputValue, setInputValue] = useState("");
   const [activeChatId, setActiveChatId] = useState(1);
 
@@ -44,9 +21,9 @@ const Dashboard = () => {
   };
 
   const handleNewChat = () => {
-    setMessages([]);
+    setMessages(chats[currentChatId]?.messages || []);
     setInputValue("");
-    setActiveChatId(null);
+    setActiveChatId(currentChatId);
   };
 
   return (
