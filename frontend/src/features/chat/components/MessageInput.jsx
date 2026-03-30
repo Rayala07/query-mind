@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from "react";
-import { RiMicLine, RiSendPlaneLine } from "@remixicon/react";
+import { RiMicLine, RiSendPlaneLine, RiLoader4Line } from "@remixicon/react";
 
-const MessageInput = ({ value, onChange, onSend }) => {
+const MessageInput = ({ value, onChange, onSend, isLoading = false }) => {
   const textareaRef = useRef(null);
 
   const autoResize = useCallback(() => {
@@ -18,7 +18,7 @@ const MessageInput = ({ value, onChange, onSend }) => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      onSend?.();
+      if (!isLoading) onSend?.();
     }
   };
 
@@ -31,15 +31,17 @@ const MessageInput = ({ value, onChange, onSend }) => {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message QueryMind..."
+          placeholder={isLoading ? "Waiting for response…" : "Message QueryMind..."}
+          disabled={isLoading}
           rows={1}
-          className="flex-1 bg-transparent text-sm text-white/85 placeholder-white/25 resize-none outline-none leading-relaxed py-0.5 scrollbar-hide"
+          className="flex-1 bg-transparent text-sm text-white/85 placeholder-white/25 resize-none outline-none leading-relaxed py-0.5 scrollbar-hide disabled:opacity-50"
           style={{ maxHeight: "160px" }}
         />
 
         {/* Voice Button */}
         <button
-          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-white/35 hover:text-white/65 hover:bg-white/[0.06] transition-all duration-150"
+          disabled={isLoading}
+          className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl text-white/35 hover:text-white/65 hover:bg-white/[0.06] transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Voice input"
         >
           <RiMicLine size={17} />
@@ -48,11 +50,14 @@ const MessageInput = ({ value, onChange, onSend }) => {
         {/* Send Button */}
         <button
           onClick={onSend}
-          disabled={!value?.trim()}
+          disabled={!value?.trim() || isLoading}
           className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white/60 hover:text-white/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-150 active:scale-95"
           aria-label="Send message"
         >
-          <RiSendPlaneLine size={16} />
+          {isLoading
+            ? <RiLoader4Line size={16} className="animate-spin" />
+            : <RiSendPlaneLine size={16} />
+          }
         </button>
       </div>
       <p className="text-center text-[10px] text-white/15 mt-2.5 tracking-wide">
