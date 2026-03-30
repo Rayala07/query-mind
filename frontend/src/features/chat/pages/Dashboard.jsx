@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
 import MessageInput from "../components/MessageInput";
 import { useChat } from "../hooks/useChat";
 import { setCurrentChatId } from "../chat.slice";
+import { initSocketConnection } from "../services/chat.socket";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { chats, currentChatId, isLoading } = useSelector((state) => state.chat);
-  const { handleSendMessage } = useChat();
+  const { handleSendMessage, handleGetChats, handleOpenChat } = useChat();
+
+  useEffect(() => {
+    initSocketConnection();
+    handleGetChats();
+  }, []);
 
   const [inputValue, setInputValue] = useState("");
 
-  // Derive messages from Redux state — always in sync
   const messages = chats[currentChatId]?.messages || [];
 
   const handleSend = async () => {
@@ -24,7 +29,7 @@ const Dashboard = () => {
   };
 
   const handleSelectChat = (chatId) => {
-    dispatch(setCurrentChatId(chatId));
+    handleOpenChat(chatId);
   };
 
   const handleNewChat = () => {

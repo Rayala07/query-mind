@@ -9,7 +9,7 @@ export const sendMessage = async ({ message, chatId }) => {
   try {
     const response = await chat_api.post("/api/chats/message", {
       message,
-      chatId,
+      chat: chatId,
     });
     return response.data;
   } catch (err) {

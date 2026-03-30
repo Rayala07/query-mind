@@ -1,23 +1,14 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { RiAddLine, RiLogoutBoxLine } from "@remixicon/react";
 import ChatItem from "./ChatItem";
 import userProfileImg from "../../../assets/user_profile.jpeg";
 
-const mockChats = [
-  { id: 1, title: "How does quantum computing work?" },
-  { id: 2, title: "Explain React Server Components" },
-  { id: 3, title: "Best practices for REST APIs" },
-  { id: 4, title: "Machine learning fundamentals" },
-  { id: 5, title: "TypeScript advanced types" },
-];
-
 const Sidebar = ({ activeChatId, onSelectChat, onNewChat }) => {
-  const [chats, setChats] = useState(mockChats);
-  const [showLogout, setShowLogout] = useState(false);
+  const { chats } = useSelector((state) => state.chat);
+  const chatList = Object.values(chats);
 
-  const handleDelete = (id) => {
-    setChats((prev) => prev.filter((c) => c.id !== id));
-  };
+  const [showLogout, setShowLogout] = useState(false);
 
   return (
     <aside className="w-64 h-full flex flex-col bg-[#0a0a0a] border-r border-white/[0.06] flex-shrink-0">
@@ -60,17 +51,25 @@ const Sidebar = ({ activeChatId, onSelectChat, onNewChat }) => {
 
       {/* Chat List */}
       <div className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5 scrollbar-hide">
-        {chats.map((chat) => (
-          <ChatItem
-            key={chat.id}
-            title={chat.title}
-            isActive={activeChatId === chat.id}
-            onDelete={() => handleDelete(chat.id)}
-          />
-        ))}
+        {chatList.length === 0 ? (
+          <p className="text-xs text-white/20 text-center mt-6 px-2">
+            No chats yet. Start a new conversation.
+          </p>
+        ) : (
+          chatList.map((chat) => (
+            <ChatItem
+              key={chat.id}
+              title={chat.title}
+              isActive={activeChatId === chat.id}
+              onClick={() => onSelectChat(chat.id)}
+              onDelete={() => {}}
+            />
+          ))
+        )}
       </div>
     </aside>
   );
 };
 
 export default Sidebar;
+

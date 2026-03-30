@@ -5,8 +5,6 @@ import { useSelector } from "react-redux";
 const ChatWindow = ({ messages }) => {
   const bottomRef = useRef(null);
 
-  
-
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);

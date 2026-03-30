@@ -1,8 +1,9 @@
 import { RiDeleteBinLine } from "@remixicon/react";
 
-const ChatItem = ({ title, isActive = false, onDelete }) => {
+const ChatItem = ({ title, isActive = false, onClick, onDelete }) => {
   return (
     <div
+      onClick={onClick}
       className={`group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors duration-150 ${
         isActive ? "bg-white/10" : "hover:bg-white/5"
       }`}
