@@ -108,10 +108,18 @@ const MessageBubble = ({ content, role }) => {
           className="w-5 h-5 object-contain"
         />
       </div>
-      <div className="max-w-[65%] bg-[#0f0f0f] border border-white/[0.07] rounded-2xl rounded-tl-sm px-4 py-3">
-        <ReactMarkdown components={markdownComponents}>
-          {content}
-        </ReactMarkdown>
+      <div className="max-w-[65%] bg-[#0f0f0f] border border-white/[0.07] rounded-2xl rounded-tl-sm px-4 py-3 min-w-[60px] min-h-[44px]">
+        {!content ? (
+          <div className="flex gap-1 items-center justify-center h-full min-h-[20px]">
+            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+            <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce"></span>
+          </div>
+        ) : (
+          <ReactMarkdown components={markdownComponents}>
+            {content}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   );

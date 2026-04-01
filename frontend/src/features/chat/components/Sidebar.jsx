@@ -62,7 +62,7 @@ const Sidebar = ({ activeChatId, onSelectChat, onNewChat }) => {
               title={chat.title}
               isActive={activeChatId === chat.id}
               onClick={() => onSelectChat(chat.id)}
-              onDelete={() => {}}
+              chatId={chat.id}
             />
           ))
         )}

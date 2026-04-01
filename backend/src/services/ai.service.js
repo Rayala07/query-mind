@@ -10,6 +10,7 @@ import {
 import "dotenv/config";
 import * as z from "zod";
 import { searchInternet } from "./internet.service.js";
+import { emitToSocket } from "../sockets/server.socket.js";
 
 const geminiModel = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash-lite",
@@ -55,12 +56,38 @@ export const generateChatTitle = async (message) => {
   return response.text;
 };
 
-export const generateResponse = async (messages) => {
-  const response = await agent.invoke({
-    messages: messages.map((message) => {
-      if (message.role === "user") return new HumanMessage(message.content);
-      else if (message.role === "ai") return new AIMessage(message.content);
-    }),
+export const generateResponse = async (messages, { socketId = null, chatId = null } = {}) => {
+  const formattedMessages = messages.map((message) => {
+    if (message.role === "user") return new HumanMessage(message.content);
+    else if (message.role === "ai") return new AIMessage(message.content);
   });
-  return response.messages[response.messages.length - 1].text;
+
+  if (!socketId) {
+    const response = await agent.invoke({
+      messages: formattedMessages,
+    });
+    return response.messages[response.messages.length - 1].text;
+  }
+
+  emitToSocket(socketId, "typing", { isTyping: true, chatId });
+
+  const eventStream = await agent.streamEvents(
+    { messages: formattedMessages },
+    { version: "v2" }
+  );
+
+  let fullContent = "";
+
+  for await (const event of eventStream) {
+    if (event.event === "on_chat_model_stream") {
+      const chunk = event.data?.chunk?.content;
+      if (chunk && typeof chunk === "string") {
+        fullContent += chunk;
+        emitToSocket(socketId, "message_chunk", { chunk, chatId });
+      }
+    }
+  }
+
+  emitToSocket(socketId, "typing", { isTyping: false, chatId });
+  return fullContent;
 };

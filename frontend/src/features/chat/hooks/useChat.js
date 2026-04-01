@@ -1,4 +1,4 @@
-import { initSocketConnection } from "../services/chat.socket";
+import { initSocketConnection, getSocket } from "../services/chat.socket";
 import {
   sendMessage,
   getChats,
@@ -6,6 +6,7 @@ import {
   deleteChat,
 } from "../services/chat.api.js";
 import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 import {
   setChats,
   setCurrentChatId,
@@ -14,16 +15,46 @@ import {
   createNewChat,
   addNewMessage,
   addMessages,
+  appendMessageChunk,
+  setTyping,
+  deleteChat as deleteChatAction,
 } from "../chat.slice.js";
 
 export const useChat = () => {
   const dispatch = useDispatch();
   const { chats } = useSelector((state) => state.chat);
 
+  useEffect(() => {
+    const socket = initSocketConnection();
+
+    const handleMessageChunk = (data) => {
+      if (data.chatId && data.chunk) {
+        dispatch(
+          appendMessageChunk({ chatId: data.chatId, chunk: data.chunk }),
+        );
+      }
+    };
+
+    const handleTyping = (data) => {
+      dispatch(setTyping(data.isTyping));
+    };
+
+    socket.on("message_chunk", handleMessageChunk);
+    socket.on("typing", handleTyping);
+
+    return () => {
+      socket.off("message_chunk", handleMessageChunk);
+      socket.off("typing", handleTyping);
+    };
+  }, [dispatch]);
+
   async function handleSendMessage({ message, chatId }) {
     try {
       dispatch(setLoading(true));
-      const data = await sendMessage({ message, chatId });
+      const socket = getSocket();
+      const socketId = socket?.id;
+
+      const data = await sendMessage({ message, chatId, socketId });
       const { chat, ai_message } = data;
 
       if (!chatId) {
@@ -94,10 +125,23 @@ export const useChat = () => {
     }
   }
 
+  async function handleDeleteChat(chatId) {
+    try {
+      dispatch(setLoading(true));
+      await deleteChat(chatId);
+      dispatch(deleteChatAction({ chatId }));
+      dispatch(setLoading(false));
+      dispatch(setCurrentChatId(null));
+    } catch (err) {
+      dispatch(setError(err));
+    }
+  }
+
   return {
     initSocketConnection,
     handleSendMessage,
     handleGetChats,
     handleOpenChat,
+    handleDeleteChat,
   };
 };

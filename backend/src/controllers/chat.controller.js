@@ -3,7 +3,7 @@ import Chat from "../models/chat.model.js";
 import Message from "../models/message.model.js";
 
 export const sendMessage = async (req, res) => {
-  const { message, chat: chatId } = req.body;
+  const { message, chat: chatId, socketId } = req.body;
 
   let title = null;
   let chat = null;
@@ -16,18 +16,44 @@ export const sendMessage = async (req, res) => {
     });
   }
 
+  const actualChatId = chatId || chat._id;
+
   const user_message = await Message.create({
-    chat: chatId || chat._id,
+    chat: actualChatId,
     content: message,
     role: "user",
   });
 
-  const messages = await Message.find({ chat: chatId || chat._id });
+  const performAIResponse = async () => {
+    try {
+      const messages = await Message.find({ chat: actualChatId });
+      const response = await generateResponse(messages, { socketId, chatId: actualChatId });
+      await Message.create({
+        chat: actualChatId,
+        content: response,
+        role: "ai",
+      });
+    } catch (err) {
+      console.error("AI response generation err", err);
+    }
+  };
 
+  if (socketId) {
+    performAIResponse();
+    return res.status(201).json({
+      success: true,
+      title,
+      chat,
+      user_message,
+      ai_message: { content: "", role: "ai" },
+    });
+  }
+
+  const messages = await Message.find({ chat: actualChatId });
   const response = await generateResponse(messages);
 
   const ai_message = await Message.create({
-    chat: chatId || chat._id,
+    chat: actualChatId,
     content: response,
     role: "ai",
   });

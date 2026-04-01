@@ -1,11 +1,20 @@
 import { io } from "socket.io-client";
 
-export const initSocketConnection = () => {
-  const socket = io(import.meta.env.VITE_BACKEND_URL, {
-    withCredentials: true,
-  });
+let socket;
 
-  socket.on("connect", () => {
-    console.log("Socket.IO connected to server");
-  });
+export const initSocketConnection = () => {
+  if (!socket) {
+    socket = io(import.meta.env.VITE_BACKEND_URL, {
+      withCredentials: true,
+    });
+
+    socket.on("connect", () => {
+      console.log("Socket.IO connected to server with ID:", socket.id);
+    });
+  }
+  return socket;
+};
+
+export const getSocket = () => {
+  return socket;
 };

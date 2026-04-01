@@ -25,3 +25,9 @@ export function getIO() {
 
   return io;
 }
+
+export function emitToSocket(socketId, event, data) {
+  if (io && socketId) {
+    io.to(socketId).emit(event, data);
+  }
+}
