@@ -22,7 +22,7 @@ const ChatWindow = ({ messages }) => {
       const randomIndex = Math.floor(Math.random() * WELCOME_MESSAGES.length);
       setWelcomeMessage(WELCOME_MESSAGES[randomIndex]);
     }
-  }, [messages]);
+  }, [messages?.length]);
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide flex flex-col relative w-full h-full">

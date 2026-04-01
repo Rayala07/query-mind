@@ -77,13 +77,33 @@ export const generateResponse = async (messages, { socketId = null, chatId = nul
   );
 
   let fullContent = "";
+  let toolInProgress = false;
+  let toolEverCalled = false;
+  let isInFinalAnswer = false;
 
   for await (const event of eventStream) {
+    if (event.event === "on_tool_start") {
+      toolInProgress = true;
+      toolEverCalled = true;
+      isInFinalAnswer = false;
+    }
+
+    if (event.event === "on_tool_end") {
+      toolInProgress = false;
+      isInFinalAnswer = true;
+    }
+
     if (event.event === "on_chat_model_stream") {
-      const chunk = event.data?.chunk?.content;
-      if (chunk && typeof chunk === "string") {
-        fullContent += chunk;
-        emitToSocket(socketId, "message_chunk", { chunk, chatId });
+      // Stream only if: no tools were ever called (direct answer)
+      // OR we are in the final answer phase (after the last tool finished)
+      const shouldStream = !toolEverCalled || isInFinalAnswer;
+
+      if (shouldStream) {
+        const chunk = event.data?.chunk?.content;
+        if (chunk && typeof chunk === "string") {
+          fullContent += chunk;
+          emitToSocket(socketId, "message_chunk", { chunk, chatId });
+        }
       }
     }
   }

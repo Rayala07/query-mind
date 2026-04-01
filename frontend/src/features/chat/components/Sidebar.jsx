@@ -3,10 +3,12 @@ import { useSelector } from "react-redux";
 import { RiAddLine, RiLogoutBoxLine } from "@remixicon/react";
 import ChatItem from "./ChatItem";
 import userProfileImg from "../../../assets/user_profile.jpeg";
+import { useChat } from "../hooks/useChat";
 
 const Sidebar = ({ activeChatId, onSelectChat, onNewChat }) => {
   const { chats } = useSelector((state) => state.chat);
   const chatList = Object.values(chats);
+  const { handleDeleteChat } = useChat();
 
   const [showLogout, setShowLogout] = useState(false);
 
@@ -62,7 +64,7 @@ const Sidebar = ({ activeChatId, onSelectChat, onNewChat }) => {
               title={chat.title}
               isActive={activeChatId === chat.id}
               onClick={() => onSelectChat(chat.id)}
-              chatId={chat.id}
+              onDelete={() => handleDeleteChat(chat.id)}
             />
           ))
         )}

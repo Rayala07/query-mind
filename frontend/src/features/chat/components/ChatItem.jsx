@@ -1,14 +1,6 @@
 import { RiDeleteBinLine } from "@remixicon/react";
-import { useChat } from "../hooks/useChat";
 
-const ChatItem = ({ title, isActive = false, onClick, chatId }) => {
-  const { handleDeleteChat } = useChat();
-
-  const handleChatDelete = () => {
-    handleDeleteChat(chatId);
-    
-  };
-
+const ChatItem = ({ title, isActive = false, onClick, onDelete }) => {
   return (
     <div
       onClick={onClick}
@@ -20,8 +12,9 @@ const ChatItem = ({ title, isActive = false, onClick, chatId }) => {
         {title}
       </span>
       <button
-        onClick={() => {
-          handleChatDelete();
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete?.();
         }}
         className="ml-2 opacity-0 group-hover:opacity-100 p-1 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/70 transition-all duration-150 flex-shrink-0"
         aria-label="Delete chat"
@@ -33,3 +26,4 @@ const ChatItem = ({ title, isActive = false, onClick, chatId }) => {
 };
 
 export default ChatItem;
+
