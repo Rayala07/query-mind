@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "../components/Sidebar";
 import ChatWindow from "../components/ChatWindow";
 import MessageInput from "../components/MessageInput";
-import { useChat } from "../hooks/useChat";
+import { useChat, useSocketListeners } from "../hooks/useChat";
 import { setCurrentChatId } from "../chat.slice";
 import { initSocketConnection } from "../services/chat.socket";
 
@@ -11,6 +11,9 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const { chats, currentChatId, isLoading } = useSelector((state) => state.chat);
   const { handleSendMessage, handleGetChats, handleOpenChat } = useChat();
+
+  // Bind socket listeners once for the whole app
+  useSocketListeners();
 
   useEffect(() => {
     initSocketConnection();

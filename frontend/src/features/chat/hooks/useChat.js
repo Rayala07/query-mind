@@ -20,9 +20,8 @@ import {
   deleteChat as deleteChatAction,
 } from "../chat.slice.js";
 
-export const useChat = () => {
+export const useSocketListeners = () => {
   const dispatch = useDispatch();
-  const { chats } = useSelector((state) => state.chat);
 
   useEffect(() => {
     const socket = initSocketConnection();
@@ -47,6 +46,11 @@ export const useChat = () => {
       socket.off("typing", handleTyping);
     };
   }, [dispatch]);
+};
+
+export const useChat = () => {
+  const dispatch = useDispatch();
+  const { chats } = useSelector((state) => state.chat);
 
   async function handleSendMessage({ message, chatId }) {
     try {
